@@ -4,6 +4,8 @@
 #include "osint.h"
 #include "vecx.h"
 
+#include "AS3.h"
+
 #define EMU_TIMER 30 /* the emulators heart beats at 20 milliseconds */
 typedef unsigned char Uint8; 
 //static SDL_Surface *screen = NULL;
@@ -56,7 +58,7 @@ static void init(){
 		fclose(f);
 	}
 }
-
+/*
 void resize(int width, int height){
 	long sclx, scly;
 
@@ -72,7 +74,7 @@ void resize(int width, int height){
 
 	offx = (screenx - ALG_MAX_X / scl_factor) / 2;
 	offy = (screeny - ALG_MAX_Y / scl_factor) / 2;
-}
+}*/
 
 static void readevents(){
 	/*SDL_Event e;
@@ -169,8 +171,67 @@ void osint_emuloop(){
 		}
 	}
 }
+AS3_Val flash_keydown(void *data, AS3_Val args){
+	return AS3_Int(0);
+}
+AS3_Val flash_tick(void *data, AS3_Val args){
+	vecx_emu((VECTREX_MHZ / 1000) * EMU_TIMER, 0);
+	return AS3_Int(0);
+}
 
-int main(int argc, char *argv[]){
+AS3_Val flash_reset(void *data, AS3_Val args){
+	vecx_reset();
+	return AS3_Int(0);
+}
+
+AS3_Val flash_init(void *data, AS3_Val args){
+	FILE *f;
+	if(!(f = fopen(romfilename, "rb"))){
+		perror(romfilename);
+		return AS3_Int(1);
+	}
+	if(fread(rom, 1, sizeof (rom), f) != sizeof (rom)){
+		printf("Invalid rom length\n");
+		return AS3_Int(2);
+	}
+	fclose(f);
+
+	memset(cart, 0, sizeof (cart));
+	if(cartfilename){
+		FILE *f;
+		if(!(f = fopen(cartfilename, "rb"))){
+			perror(cartfilename);
+			return AS3_Int(2);
+		}
+		fread(cart, 1, sizeof (cart), f);
+		fclose(f);
+	}
+	vecx_reset();
+	return AS3_Int(0);
+}
+
+int main (int argc, char **argv) {
+
+	AS3_Val initMethod = AS3_Function(NULL, flash_init);
+	AS3_Val tickMethod = AS3_Function(NULL, flash_tick);
+	AS3_Val resetMethod = AS3_Function(NULL, flash_reset);
+
+	AS3_Val vecxemu = AS3_Object(
+		"init:AS3ValType, tick:AS3ValType, reset:AS3ValType", 
+		initMethod, tickMethod, resetMethod
+	);
+
+	AS3_Release( initMethod );
+	AS3_Release( tickMethod );
+	AS3_Release( resetMethod );
+
+	AS3_LibInit(vecxemu);
+
+	return 0;
+}
+
+
+/*int main(int argc, char **argv){
 	//SDL_Init(SDL_INIT_VIDEO);
 
 	resize(330*3/2, 410*3/2);
@@ -184,4 +245,5 @@ int main(int argc, char *argv[]){
 
 	return 0;
 }
+*/
 

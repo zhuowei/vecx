@@ -1,13 +1,17 @@
+NAME = vecx
+PATH := ${ALCHEMY_HOME}/achacks:${PATH}
+CC = gcc
+CFLAGS = -O2 -Wall -Wextra -swc
+OBJS = e6809.o osint.o vecx.o
 
-CFLAGS := -O2 -Wall -Wextra $(shell sdl-config --cflags)
-LIBS := $(shell sdl-config --libs) -lSDL_gfx
-OBJECTS := e6809.o osint.o vecx.o
-TARGET := vecx
-CLEANFILES := $(TARGET) $(OBJECTS)
+.c.o:
+	$(CC) $(INC) $(CFLAGS) -c $<
 
-$(TARGET): $(OBJECTS)
-	gcc $(CFLAGS) -o $@ $^ $(LIBS)
+all: $(NAME)
+
+$(NAME) : $(OBJS)
+	$(CC) $(CFLAGS) -swc -o $(NAME).swc $(OBJS)
 
 clean:
-	$(RM) $(CLEANFILES)
-
+	rm $(OBJS) $(NAME).swc 
+	rm *achacks*

@@ -1,2 +1,6 @@
 *.swf
 *.achacks.*
+*.o
+src/c/vecx
+src/c/vecx.swc
+
