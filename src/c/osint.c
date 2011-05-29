@@ -1,13 +1,12 @@
-
-#include "SDL.h"
-#include "SDL_gfxPrimitives.h"
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "osint.h"
 #include "vecx.h"
 
 #define EMU_TIMER 30 /* the emulators heart beats at 20 milliseconds */
-
-static SDL_Surface *screen = NULL;
+typedef unsigned char Uint8; 
+//static SDL_Surface *screen = NULL;
 
 static long screenx;
 static long screeny;
@@ -16,19 +15,19 @@ static long offx;
 static long offy;
 
 void osint_render(void){
-	SDL_FillRect(screen, NULL, 0);
+	//SDL_FillRect(screen, NULL, 0);
 
 	int v;
 	for(v = 0; v < vector_draw_cnt; v++){
 		Uint8 c = vectors_draw[v].color * 256 / VECTREX_COLORS;
-		aalineRGBA(screen,
+		/*aalineRGBA(screen,
 				offx + vectors_draw[v].x0 / scl_factor,
 				offy + vectors_draw[v].y0 / scl_factor,
 				offx + vectors_draw[v].x1 / scl_factor,
 				offy + vectors_draw[v].y1 / scl_factor,
-				c, c, c, 0xff);
+				c, c, c, 0xff);*/
 	}
-	SDL_Flip(screen);
+	//SDL_Flip(screen);
 }
 
 static char *romfilename = "rom.dat";
@@ -63,11 +62,12 @@ void resize(int width, int height){
 
 	screenx = width;
 	screeny = height;
-	screen = SDL_SetVideoMode(screenx, screeny, 0, SDL_SWSURFACE | SDL_RESIZABLE);
+	//screen = SDL_SetVideoMode(screenx, screeny, 0, SDL_SWSURFACE | SDL_RESIZABLE);
 
-	sclx = ALG_MAX_X / screen->w;
-	scly = ALG_MAX_Y / screen->h;
-
+//	sclx = ALG_MAX_X / screen->w;
+//	scly = ALG_MAX_Y / screen->h;
+	sclx = 1;
+	scly = 1;
 	scl_factor = sclx > scly ? sclx : scly;
 
 	offx = (screenx - ALG_MAX_X / scl_factor) / 2;
@@ -75,7 +75,7 @@ void resize(int width, int height){
 }
 
 static void readevents(){
-	SDL_Event e;
+	/*SDL_Event e;
 	while(SDL_PollEvent(&e)){
 		switch(e.type){
 			case SDL_QUIT:
@@ -149,29 +149,29 @@ static void readevents(){
 			default:
 				break;
 		}
-	}
+	}*/
 }
 
 void osint_emuloop(){
-	Uint32 next_time = SDL_GetTicks() + EMU_TIMER;
+	//Uint32 next_time = SDL_GetTicks() + EMU_TIMER;
 	vecx_reset();
 	for(;;){
 		vecx_emu((VECTREX_MHZ / 1000) * EMU_TIMER, 0);
 		readevents();
 
 		{
-			Uint32 now = SDL_GetTicks();
+			/*Uint32 now = SDL_GetTicks();
 			if(now < next_time)
 				SDL_Delay(next_time - now);
 			else
 				next_time = now;
-			next_time += EMU_TIMER;
+			next_time += EMU_TIMER;*/
 		}
 	}
 }
 
 int main(int argc, char *argv[]){
-	SDL_Init(SDL_INIT_VIDEO);
+	//SDL_Init(SDL_INIT_VIDEO);
 
 	resize(330*3/2, 410*3/2);
 
